@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 // Inclui os arquivos que definem as funcoes da fila e historico
-#include "fila.h"
-#include "historico.h"
+#include "fila.c"
+#include "historico.c"
 
 /*
  * main.c
@@ -97,7 +97,7 @@ int main() {
 
             case 2: { // REALIZAR ATENDIMENTO (Remover da Fila e Salvar no Historico)
                 Estudante atendido;
-                // removeFila tenta tirar o primeiro da fila
+                //tenta tirar o primeiro da fila
                 if(removeFila(fila, &atendido)) {
                     printf("\n--- NOVO ATENDIMENTO ---\n");
                     printf("-> Chamando: %s\n", atendido.nome);
