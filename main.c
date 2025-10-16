@@ -4,6 +4,8 @@
 #include "lista.h"
 #include "paciente.h"
 #include "agendamento.h"
+#include "validaCpf.h"
+#include "validaDataHora.h"
 
 Lista* listaPacientes;
 Lista* listaAgendamentos;
@@ -20,7 +22,13 @@ void menuCadastrarPaciente() {
     printf("CPF: "); scanf("%14[^\n]", p.cpf); clear_input();
     printf("Matricula: "); scanf("%19[^\n]", p.matricula); clear_input();
     printf("Curso: "); scanf("%49[^\n]", p.curso); clear_input();
-    
+
+    if (!validarCPF(p.cpf)) {
+            printf("CPF invalido!\n");
+            return;
+        }
+
+
     if (cadastrarPaciente(listaPacientes, p)) {
         printf("✅ Paciente cadastrado com sucesso!\n");
     } else {
@@ -45,6 +53,19 @@ void menuAgendarConsulta() {
     printf("Data (DD/MM/AAAA): "); scanf("%10[^\n]", a.data); clear_input();
     printf("Hora (HH:MM): "); scanf("%5[^\n]", a.hora); clear_input();
     strcpy(a.status, "agendado");
+
+    if (!validarCPF(a.cpf)) {
+        printf("CPF invalido!\n");
+        return;
+    }
+    if (!validarData(a.data)) {
+        printf("Data invalida!\n");
+        return;
+    }
+    if (!validarHora(a.hora)) {
+        printf("Hora invalida!\n");
+        return;
+    }
     
     if (cadastrarAgendamento(listaAgendamentos, a)) {
         printf("✅ Consulta agendada com sucesso!\n");

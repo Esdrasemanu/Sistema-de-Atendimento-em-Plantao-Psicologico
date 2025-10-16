@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "validadatahora.h": "c",
+        "validacpf.h": "c",
+        "stdlib.h": "c",
+        "agendamento.h": "c"
+    }
+}

@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "validaCpf.h"
+#include "validaDataHora.h"
 
 void exibirAgendamento(void* dado) {
     Agendamento* a = (Agendamento*)dado;
@@ -42,6 +44,20 @@ void liberarAgendamento(void* dado) {
 }
 
 int cadastrarAgendamento(Lista* lista, Agendamento a) {
+
+    if (!validarCPF(a.cpf)) {
+        printf("CPF invalido\n");
+        return 0;
+    }
+    if(validarData(a.data) == 0) {
+        printf("Data invalida\n");
+        return 0;
+    }
+    if (validarHora(a.hora) == 0) {
+        printf("Hora invalida\n");
+        return 0;
+    }
+
     Agendamento* novo = (Agendamento*)malloc(sizeof(Agendamento));
     if (!novo) return 0;
     *novo = a;

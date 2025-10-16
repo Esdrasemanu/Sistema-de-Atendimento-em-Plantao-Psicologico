@@ -1,4 +1,5 @@
 #include "paciente.h"
+#include "validaCpf.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,12 @@ void liberarPaciente(void* dado) {
 }
 
 int cadastrarPaciente(Lista* lista, Paciente p) {
+
+    if (!validarCPF(p.cpf)) {
+        printf("CPF invalido!\n");
+        return 0;
+    }
+
     if (buscarElemento(lista, (void*)p.cpf, compararPacienteCPF)) {
         printf("Erro: CPF ja cadastrado!\n");
         return 0;
