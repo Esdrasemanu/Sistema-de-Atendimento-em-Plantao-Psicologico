@@ -1,10 +1,6 @@
-Este é o seu Diário de Bordo **revisado**, focado no **Sistema de Atendimento de Plantão Psicológico**.
 
-Mantenho a estrutura e a riqueza de detalhes do seu texto original, ajustando o contexto para o tema da psicologia universitária, o que torna o documento ainda mais específico e coeso com a proposta de uma clínica universitária.
 
----
-
-# 📋 DIÁRIO DE BORDO – SISTEMA DE ATENDIMENTO UNIVERSITÁRIO
+# DIÁRIO DE BORDO – SISTEMA DE ATENDIMENTO UNIVERSITÁRIO
 ## **(Plantão Psicológico)**
 
 ### Disciplina: Estrutura de Dados
