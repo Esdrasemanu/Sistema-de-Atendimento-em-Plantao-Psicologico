@@ -1,8 +1,8 @@
 #include "lista.h"
 
 /**
- * @brief Cria e inicializa uma nova lista vazia
- * @autor [Seu Nome]
+Cria e inicializa uma nova lista vazia
+ 
  */
 Lista* criarLista() {
     Lista* nova = (Lista*)malloc(sizeof(Lista));
@@ -19,8 +19,7 @@ Lista* criarLista() {
 }
 
 /**
- * @brief Verifica se a lista está vazia
- * @autor [Seu Nome]
+ Verifica se a lista está vazia
  */
 int listaVazia(Lista* lista) {
     if (lista == NULL) {
@@ -31,8 +30,8 @@ int listaVazia(Lista* lista) {
 }
 
 /**
- * @brief Insere um elemento no FINAL da lista
- * @autor [Seu Nome]
+Insere um elemento no FINAL da lista
+ 
  */
 int inserirFinal(Lista* lista, void* dado) {
     if (lista == NULL) {
@@ -72,8 +71,8 @@ int inserirFinal(Lista* lista, void* dado) {
 }
 
 /**
- * @brief Remove um elemento da lista usando função de comparação
- * @autor [Seu Nome]
+  Remove um elemento da lista usando função de comparação
+ 
  */
 void* removerElemento(Lista* lista, void* chave, int (*comparar)(void*, void*)) {
     if (lista == NULL || lista->inicio == NULL || comparar == NULL) {
@@ -116,8 +115,8 @@ void* removerElemento(Lista* lista, void* chave, int (*comparar)(void*, void*)) 
 }
 
 /**
- * @brief Busca um elemento na lista
- * @autor [Seu Nome]
+ Busca um elemento na lista
+ 
  */
 void* buscarElemento(Lista* lista, void* chave, int (*comparar)(void*, void*)) {
     if (lista == NULL || comparar == NULL) {
@@ -137,8 +136,8 @@ void* buscarElemento(Lista* lista, void* chave, int (*comparar)(void*, void*)) {
 }
 
 /**
- * @brief Busca todos os elementos que atendem a um critério
- * @autor [Seu Nome]
+ Busca todos os elementos que atendem a um critério
+
  */
 Lista* buscarTodosElementos(Lista* lista, void* chave, int (*comparar)(void*, void*)) {
     if (lista == NULL || comparar == NULL) {
@@ -175,8 +174,8 @@ Lista* buscarTodosElementos(Lista* lista, void* chave, int (*comparar)(void*, vo
 }
 
 /**
- * @brief Exibe todos os elementos da lista
- * @autor [Seu Nome]
+ Exibe todos os elementos da lista
+ 
  */
 void exibirLista(Lista* lista, void (*formatar)(void*)) {
     if (lista == NULL) {
@@ -206,8 +205,8 @@ void exibirLista(Lista* lista, void (*formatar)(void*)) {
 }
 
 /**
- * @brief Libera toda a memória alocada para a lista
- * @autor [Seu Nome]
+ Libera toda a memória alocada para a lista
+
  */
 void destruirLista(Lista* lista, void (*liberarDados)(void*)) {
     if (lista == NULL) {
@@ -231,8 +230,8 @@ void destruirLista(Lista* lista, void (*liberarDados)(void*)) {
 }
 
 /**
- * @brief Retorna a quantidade de elementos na lista
- * @autor [Seu Nome]
+Retorna a quantidade de elementos na lista
+
  */
 int tamanhoLista(Lista* lista) {
     if (lista == NULL) {
@@ -242,8 +241,8 @@ int tamanhoLista(Lista* lista) {
 }
 
 /**
- * @brief Percorre a lista aplicando uma função em cada elemento
- * @autor [Seu Nome]
+ Percorre a lista aplicando uma função em cada elemento
+ 
  */
 void percorrerLista(Lista* lista, void (*funcao)(void*)) {
     if (lista == NULL || funcao == NULL) {
