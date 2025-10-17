@@ -37,9 +37,9 @@ void menuCadastrarPaciente() {
 
 
     if (cadastrarPaciente(listaPacientes, p)) {
-        printf("✅ Paciente cadastrado com sucesso!\n");
+        printf("Paciente cadastrado com sucesso!\n");
     } else {
-        printf("❌ Erro ao cadastrar paciente!\n");
+        printf("Erro ao cadastrar paciente!\n");
     }
 }
 
@@ -100,9 +100,9 @@ void menuAgendarConsulta() {
     }
 
     if (cadastrarAgendamento(listaAgendamentos, a)) {
-        printf("✅ Consulta agendada com sucesso!\n");
+        printf("Consulta agendada com sucesso!\n");
     } else {
-        printf("❌ Erro ao agendar consulta!\n");
+        printf("Erro ao agendar consulta!\n");
     }
 }
 
@@ -122,7 +122,7 @@ void menuConsultarCPF() {
         exibirLista(resultado, exibirAgendamentoDetalhado);
         destruirLista(resultado, NULL);
     } else {
-        printf("❌ Nenhum agendamento encontrado!\n");
+        printf("Nenhum agendamento encontrado!\n");
     }
 }
 
@@ -142,7 +142,7 @@ void menuConsultarSala() {
         exibirLista(resultado, exibirAgendamentoDetalhado);
         destruirLista(resultado, NULL);
     } else {
-        printf("❌ Nenhum agendamento encontrado!\n");
+        printf("Nenhum agendamento encontrado!\n");
     }
 }
 
@@ -165,9 +165,9 @@ void menuCancelarAgendamento() {
     }
 
     if (cancelarAgendamento(listaAgendamentos, cpf, data)) {
-        printf("✅ Agendamento cancelado com sucesso!\n");
+        printf("Agendamento cancelado com sucesso!\n");
     } else {
-        printf("❌ Agendamento nao encontrado!\n");
+        printf("Agendamento nao encontrado!\n");
     }
 }
 
@@ -200,7 +200,7 @@ int main() {
     listaAgendamentos = criarLista();
     
     if (!listaPacientes || !listaAgendamentos) {
-        printf("❌ Erro ao inicializar sistema!\n");
+        printf("Erro ao inicializar sistema!\n");
         return 1;
     }
     
@@ -247,8 +247,8 @@ int main() {
                 printf("\n");
             } break;
             case 7: menuHistoricoCompleto(); break;
-            case 0: printf("👋 Saindo...\n"); break;
-            default: printf("❌ Opcao invalida!\n");
+            case 0: printf("Saindo...\n"); break;
+            default: printf("opcao invalida!\n");
         }
     } while(opcao != 0);
     
