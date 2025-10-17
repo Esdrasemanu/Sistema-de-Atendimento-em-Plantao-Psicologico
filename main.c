@@ -56,43 +56,74 @@ void menuAgendarConsulta() {
         if (!buscarPacienteCPF(listaPacientes, cpf)) { printf("Paciente nao encontrado! Cadastre primeiro.\n"); continue; }
         break;
     }
-    
-    strcpy(a.cpf, cpf);
-    // Sala: repetir até válida ou cancelamento
+        strcpy(a.cpf, cpf);
+     // Sala: repetir até válida ou cancelamento
     while (1) {
-        printf("Sala (0 para cancelar): "); scanf("%9[^\n]", a.sala); clear_input();
-        if (strcmp(a.sala, "0") == 0) return;
-        if (!validarSala(a.sala)) { printf("Sala invalida!\n"); imprimirSalas(); continue; }
-        break;
+        printf("Sala (0 para cancelar): "); 
+        scanf("%9[^\n]", a.sala); 
+        clear_input();
+        
+        if (strcmp(a.sala, "0") == 0) {
+            printf("Operacao cancelada.\n");
+            return;
+        }
+        
+        if (validarSala(a.sala)) break;
+        printf("❌ Sala invalida! ");
+        imprimirSalas();
     }
+    
     // Data: repetir até válida ou cancelar
     while (1) {
-        printf("Data (DD/MM/AAAA) (0 para cancelar): "); scanf("%10[^\n]", a.data); clear_input();
-        if (strcmp(a.data, "0") == 0) return;
-        if (!validarData(a.data)) { printf("Data invalida!\n"); continue; }
-        break;
+        printf("Data (DD/MM/AAAA) (0 para cancelar): "); 
+        scanf("%10[^\n]", a.data); 
+        clear_input();
+        
+        if (strcmp(a.data, "0") == 0) {
+            printf("Operacao cancelada.\n");
+            return;
+        }
+        
+        if (validarData(a.data)) {
+            if (validarDataFutura(a.data)) {
+                break;
+            } else {
+                printf("❌ Data ja passou! Use uma data futura.\n");
+            }
+        } else {
+            printf("❌ Formato de data invalido! Use DD/MM/AAAA.\n");
+        }
     }
+    
     // Hora: repetir até válida ou cancelar
     while (1) {
-        printf("Hora (HH:MM) (0 para cancelar): "); scanf("%5[^\n]", a.hora); clear_input();
-        if (strcmp(a.hora, "0") == 0) return;
-        if (!validarHora(a.hora)) { printf("Hora invalida!\n"); continue; }
-        break;
+        printf("Hora (HH:MM) (0 para cancelar): "); 
+        scanf("%5[^\n]", a.hora); 
+        clear_input();
+        
+        if (strcmp(a.hora, "0") == 0) {
+            printf("Operacao cancelada.\n");
+            return;
+        }
+        
+        if (validarHora(a.hora)) {
+            if (validarHoraIntervalo(a.hora)) {
+                if (ehDataHoraFutura(a.data, a.hora)) {
+                    break;
+                } else {
+                    printf("❌ Data/hora ja passou! Use uma data/hora futura.\n");
+                }
+            } else {
+                printf("❌ Hora invalida! Use horarios em intervalos de 15 min (ex: 14:00, 14:15, 14:30, 14:45).\n");
+            }
+        } else {
+            printf("❌ Formato de hora invalido! Use HH:MM.\n");
+        }
     }
+    
     strcpy(a.status, "agendado");
 
-    if (!validarCPF(a.cpf)) {
-        printf("CPF invalido!\n");
-        return;
-    }
-    if (!validarData(a.data)) {
-        printf("Data invalida!\n");
-        return;
-    }
-    if (!validarHora(a.hora)) {
-        printf("Hora invalida!\n");
-        return;
-    }
+   
     // Verifica disponibilidade da sala no horario
     if (!salaDisponivel(listaAgendamentos, a.sala, a.data, a.hora)) {
         printf("Sala %s ocupada em %s as %s! Escolha outro horario ou sala.\n", a.sala, a.data, a.hora);

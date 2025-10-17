@@ -4,6 +4,7 @@
 #include <string.h>
 #include "validaCpf.h"
 #include "validaDataHora.h"
+#include "validaSala.h"
 
 void exibirAgendamento(void* dado) {
     Agendamento* a = (Agendamento*)dado;
@@ -44,17 +45,46 @@ void liberarAgendamento(void* dado) {
 }
 
 int cadastrarAgendamento(Lista* lista, Agendamento a) {
-
+    // Validações em camadas
     if (!validarCPF(a.cpf)) {
-        printf("CPF invalido\n");
+        printf("❌ CPF invalido!\n");
         return 0;
     }
-    if(validarData(a.data) == 0) {
-        printf("Data invalida\n");
+    
+    if (!validarSala(a.sala)) {
+        printf("❌ Sala invalida! ");
+        imprimirSalas();
         return 0;
     }
-    if (validarHora(a.hora) == 0) {
-        printf("Hora invalida\n");
+    
+    if (!validarData(a.data)) {
+        printf("❌ Formato de data invalido! Use DD/MM/AAAA.\n");
+        return 0;
+    }
+    
+    if (!validarDataFutura(a.data)) {
+        printf("❌ Data ja passou! Use uma data futura.\n");
+        return 0;
+    }
+    
+    if (!validarHora(a.hora)) {
+        printf("❌ Formato de hora invalido! Use HH:MM.\n");
+        return 0;
+    }
+    
+    if (!validarHoraIntervalo(a.hora)) {
+        printf("❌ Hora invalida! Use horarios em intervalos de 15 min (ex: 14:00, 14:15, 14:30, 14:45).\n");
+        return 0;
+    }
+    
+    if (!ehDataHoraFutura(a.data, a.hora)) {
+        printf("❌ Data/hora ja passou! Use uma data/hora futura.\n");
+        return 0;
+    }
+    
+    // Verifica se a sala está disponível na data/hora
+    if (!salaDisponivel(lista, a.sala, a.data, a.hora)) {
+        printf("❌ Sala %s ja esta ocupada em %s as %s!\n", a.sala, a.data, a.hora);
         return 0;
     }
 
@@ -62,6 +92,12 @@ int cadastrarAgendamento(Lista* lista, Agendamento a) {
     if (!novo) return 0;
     *novo = a;
     return inserirFinal(lista, novo);
+}
+
+
+// NOVA função para verificar se há agendamentos
+int temAgendamentos(Lista* lista) {
+    return !listaVazia(lista);
 }
 
 int cancelarAgendamento(Lista* lista, const char* cpf, const char* data) {
