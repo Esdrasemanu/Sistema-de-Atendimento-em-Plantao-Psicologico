@@ -5,40 +5,25 @@
 #include <string.h>
 #include <time.h>
 
-/**
-Valida se uma data está no formato correto
-data String no formato DD/MM/AAAA
-1 se válida, 0 se inválida
- */
+// Valida se a data está no formato correto "DD/MM/AAAA"
+// Retorna 1 se estiver válida, 0 se estiver inválida
 int validarData(const char* data);
 
-/**
- Valida se uma hora está no formato correto
- hora String no formato HH:MM
- return 1 se válida, 0 se inválida
- */
+// Valida se a hora está no formato correto "HH:MM"
+// Retorna 1 se estiver válida, 0 se estiver inválida
 int validarHora(const char* hora);
 
-/**
- Valida se uma data é válida e não é passada
- data String no formato DD/MM/AAAA
- 1 se válida e futura, 0 se inválida ou passada
- */
+// Verifica se a data é válida e se está no futuro
+// Ex: não pode ser uma data passada
+// Retorna 1 se for válida e futura, 0 se inválida ou passada
 int validarDataFutura(const char* data);
 
-/**
- * Valida se o horário está nos intervalos permitidos (15 em 15 min)
- * hora String no formato HH:MM
- *  1 se válida, 0 se inválida
- */
+// Verifica se a hora está em intervalos de 15 minutos (ex: 13:00, 13:15, 13:30)
+// Retorna 1 se estiver válida, 0 se estiver fora do intervalo
 int validarHoraIntervalo(const char* hora);
 
-/**
- *  Verifica se uma data/hora já passou
- * data String da data
- *  hora String da hora
- * 1 se é futura, 0 se já passou
- */
+// Verifica se a combinação data + hora é futura
+// Retorna 1 se ainda não passou, 0 se já passou
 int ehDataHoraFutura(const char* data, const char* hora);
 
-#endif
+#endif // VALIDADATAHORA_H
