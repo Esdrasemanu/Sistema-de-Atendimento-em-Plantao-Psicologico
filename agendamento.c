@@ -193,9 +193,17 @@ int compararDatas(const char* data1, const char* data2) {
     return dia1 - dia2;
 }
 
-// Funcao auxiliar para ordenar uma lista de agendamentos por data (Insertion Sort)
 
-void ordenarAgendamentosPorData(Lista* lista) {
+int compararDataHora(Agendamento* a1, Agendamento* a2) {
+    // Primeiro compara as datas
+    int cmpData = compararDatas(a1->data, a2->data);
+    if (cmpData != 0) return cmpData;
+    
+    // Se mesma data, compara as horas
+    return strcmp(a1->hora, a2->hora);
+}
+
+void ordenarAgendamentosPorDataHora(Lista* lista) {
     if (listaVazia(lista) || lista->inicio->proximo == NULL) return;
     
     No* ordenado = NULL;
@@ -205,8 +213,8 @@ void ordenarAgendamentosPorData(Lista* lista) {
         No* proximo = atual->proximo;
         
         // Insere o nó atual na lista ordenada
-        if (ordenado == NULL || compararDatas(((Agendamento*)atual->dado)->data, 
-                                            ((Agendamento*)ordenado->dado)->data) < 0) {
+        if (ordenado == NULL || compararDataHora(((Agendamento*)atual->dado), 
+                                               ((Agendamento*)ordenado->dado)) < 0) {
             // Insere no início
             atual->proximo = ordenado;
             ordenado = atual;
@@ -214,8 +222,8 @@ void ordenarAgendamentosPorData(Lista* lista) {
             // Encontra a posição correta
             No* temp = ordenado;
             while (temp->proximo != NULL && 
-                   compararDatas(((Agendamento*)atual->dado)->data,
-                                ((Agendamento*)temp->proximo->dado)->data) >= 0) {
+                   compararDataHora(((Agendamento*)atual->dado),
+                                   ((Agendamento*)temp->proximo->dado)) >= 0) {
                 temp = temp->proximo;
             }
             atual->proximo = temp->proximo;
@@ -234,6 +242,11 @@ void ordenarAgendamentosPorData(Lista* lista) {
     }
     lista->fim = temp;
 }
+
+// Função auxiliar para comparar data E hora
+
+
+
 
 // Funcao para criar uma copia profunda da lista
 Lista* copiarListaAgendamentos(Lista* original) {
@@ -273,15 +286,41 @@ void exibirProximosAgendamentos(Lista* lista, int quantidade) {
         return;
     }
     
-    // CORREÇÃO: Cria uma cópia PROFUNDA da lista para ordenar
-    Lista* copia = copiarListaAgendamentos(lista);
+    // CORREÇÃO: Cria uma cópia PROFUNDA apenas dos agendamentos FUTUROS
+    Lista* copia = criarLista();
     if (!copia) {
         printf("Erro ao criar copia da lista!\n");
         return;
     }
     
-    // Ordena a cópia por data (NÃO afeta a original)
-    ordenarAgendamentosPorData(copia);
+    // Filtrar apenas agendamentos futuros com status "agendado"
+    No* atual = lista->inicio;
+    while (atual != NULL) {
+        Agendamento* ag = (Agendamento*)atual->dado;
+        
+        // Verifica se é agendamento futuro e com status agendado
+        if (strcmp(ag->status, "agendado") == 0 && ehDataHoraFutura(ag->data, ag->hora)) {
+            Agendamento* novoAg = malloc(sizeof(Agendamento));
+            if (novoAg) {
+                strcpy(novoAg->cpf, ag->cpf);
+                strcpy(novoAg->sala, ag->sala);
+                strcpy(novoAg->data, ag->data);
+                strcpy(novoAg->hora, ag->hora);
+                strcpy(novoAg->status, ag->status);
+                inserirFinal(copia, novoAg); // CORREÇÃO: mudado para inserirFinal
+            }
+        }
+        atual = atual->proximo;
+    }
+    
+    if (listaVazia(copia)) {
+        printf("\n Nenhum agendamento futuro encontrado!\n");
+        destruirLista(copia, liberarAgendamento);
+        return;
+    }
+    
+    // Ordena a cópia por data E hora
+    ordenarAgendamentosPorDataHora(copia);
     
     printf("\n+--------------------------------------------------------------+\n");
     printf("|                 PROXIMOS AGENDAMENTOS                      |\n");
@@ -291,7 +330,8 @@ void exibirProximosAgendamentos(Lista* lista, int quantidade) {
     
     // Exibe apenas a quantidade solicitada (ou todos se quantidade = 0)
     int contador = 0;
-    No* atual = copia->inicio;
+    int totalFuturos = tamanhoLista(copia);
+    atual = copia->inicio;
     
     while (atual != NULL && (quantidade == 0 || contador < quantidade)) {
         Agendamento* a = (Agendamento*)atual->dado;
@@ -303,7 +343,7 @@ void exibirProximosAgendamentos(Lista* lista, int quantidade) {
     
     printf("+---------------------+--------+------------+--------+---------+\n");
     printf("| Mostrando %-2d de %-36d agendamentos |\n", 
-           contador, tamanhoLista(lista));
+           contador, totalFuturos);
     printf("+--------------------------------------------------------------+\n");
     
     // Libera a copia

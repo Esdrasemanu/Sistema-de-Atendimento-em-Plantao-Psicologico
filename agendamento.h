@@ -31,8 +31,10 @@ int compararAgendamentoCPFData(void* elemento, void* chave);
 void liberarAgendamento(void* dado);
 void exibirProximosAgendamentos(Lista* lista, int quantidade);
 void exibirSalasLivres(Lista* lista, const char* data, const char* hora);
+void menuMostraTudoLivre();
+void exibirTodasSalasLivresData(const char* data);
 
-// API completa
+int temAgendamentos(Lista* lista);
 int cadastrarAgendamento(Lista* lista, Agendamento a);
 int cancelarAgendamento(Lista* lista, const char* cpf, const char* data);
 Lista* buscarAgendamentosCPF(Lista* lista, const char* cpf);
