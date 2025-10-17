@@ -8,8 +8,15 @@
 #include "validaDataHora.h"
 #include "validaSala.h"
 
+int flagTeste_Cria10Pacientes=0;
+int flagDebug_MostraPacientes=0;
 Lista* listaPacientes;
 Lista* listaAgendamentos;
+
+
+    
+    
+
 
 void clear_input() {
     int c;
@@ -48,7 +55,7 @@ void menuAgendarConsulta() {
     char cpf[MAX_CPF];
     
     printf("\n--- AGENDAR CONSULTA ---\n");
-    // Lê CPF do paciente com repetição e validação
+    // Repete input ate ser valido
     while (1) {
         printf("CPF do paciente (0 para cancelar): "); scanf("%14[^\n]", cpf); clear_input();
         if (strcmp(cpf, "0") == 0) return;
@@ -57,7 +64,7 @@ void menuAgendarConsulta() {
         break;
     }
         strcpy(a.cpf, cpf);
-     // Sala: repetir até válida ou cancelamento
+     // Repete input ate ser valido
     while (1) {
         printf("Sala (0 para cancelar): "); 
         scanf("%9[^\n]", a.sala); 
@@ -69,11 +76,11 @@ void menuAgendarConsulta() {
         }
         
         if (validarSala(a.sala)) break;
-        printf("❌ Sala invalida! ");
+        printf("Sala invalida! ");
         imprimirSalas();
     }
     
-    // Data: repetir até válida ou cancelar
+    // Repete input ate ser valido
     while (1) {
         printf("Data (DD/MM/AAAA) (0 para cancelar): "); 
         scanf("%10[^\n]", a.data); 
@@ -88,14 +95,14 @@ void menuAgendarConsulta() {
             if (validarDataFutura(a.data)) {
                 break;
             } else {
-                printf("❌ Data ja passou! Use uma data futura.\n");
+                printf("Data ja passou! Use uma data futura.\n");
             }
         } else {
-            printf("❌ Formato de data invalido! Use DD/MM/AAAA.\n");
+            printf("Formato de data invalido! Use DD/MM/AAAA.\n");
         }
     }
     
-    // Hora: repetir até válida ou cancelar
+    // Repete input ate ser valido
     while (1) {
         printf("Hora (HH:MM) (0 para cancelar): "); 
         scanf("%5[^\n]", a.hora); 
@@ -111,13 +118,13 @@ void menuAgendarConsulta() {
                 if (ehDataHoraFutura(a.data, a.hora)) {
                     break;
                 } else {
-                    printf("❌ Data/hora ja passou! Use uma data/hora futura.\n");
+                    printf("Data/hora ja passou! Use uma data/hora futura.\n");
                 }
             } else {
-                printf("❌ Hora invalida! Use horarios em intervalos de 15 min (ex: 14:00, 14:15, 14:30, 14:45).\n");
+                printf("Hora invalida! Use horarios em intervalos de 15 min (ex: 14:00, 14:15, 14:30, 14:45).\n");
             }
         } else {
-            printf("❌ Formato de hora invalido! Use HH:MM.\n");
+            printf("Formato de hora invalido! Use HH:MM.\n");
         }
     }
     
@@ -226,7 +233,59 @@ void menuHistoricoCompleto() {
     exibirHistoricoCompleto(listaAgendamentos);
 }
 
+void menuSalasLivres() {
+    char data[MAX_DATA], hora[MAX_HORA];
+    printf("\n--- SALAS LIVRES ---\n");
+    
+    // Ler data (repetir até valida ou cancelar)
+    while (1) {
+        printf("Data (DD/MM/AAAA) (0 para cancelar): "); 
+        scanf("%10[^\n]", data); 
+        clear_input();
+        if (strcmp(data, "0") == 0) return;
+        if (!validarData(data)) { 
+            printf("Data invalida!\n"); 
+            continue; 
+        }
+        break;
+    }
+    
+    // Ler hora (repetir até valida ou cancelar)
+    while (1) {
+        printf("Hora (HH:MM) (0 para cancelar): "); 
+        scanf("%5[^\n]", hora); 
+        clear_input();
+        if (strcmp(hora, "0") == 0) return;
+        if (!validarHora(hora)) { 
+            printf("Hora invalida!\n"); 
+            continue; 
+        }
+        break;
+    }
+    
+    exibirSalasLivres(listaAgendamentos, data, hora);
+}
+
+void menuProximosAgendamentos() {
+    int quantidade;
+    printf("\n--- PROXIMOS AGENDAMENTOS ---\n");
+    printf("Quantidade a mostrar (0 para todos): ");
+    scanf("%d", &quantidade);
+    clear_input();
+    
+    if (quantidade < 0) {
+        printf("Quantidade invalida!\n");
+        return;
+    }
+    
+    exibirProximosAgendamentos(listaAgendamentos, quantidade);
+}
+
 int main() {
+
+    
+
+
     listaPacientes = criarLista();
     listaAgendamentos = criarLista();
     
@@ -235,6 +294,41 @@ int main() {
         return 1;
     }
     
+    if (flagTeste_Cria10Pacientes == 1) {
+    Paciente p1 = {"João Silva", "25075653065", "20240001", "Engenharia"};
+        cadastrarPaciente(listaPacientes, p1);
+        
+        Paciente p2 = {"Maria Santos", "88288718060", "20240002", "Medicina"};
+        cadastrarPaciente(listaPacientes, p2);
+        
+        Paciente p3 = {"Pedro Costa", "099.423.780-49", "20240003", "Direito"};
+        cadastrarPaciente(listaPacientes, p3);
+        
+        Paciente p4 = {"Ana Oliveira", "216.788.690-07", "20240004", "Administração"};
+        cadastrarPaciente(listaPacientes, p4);
+        
+        Paciente p5 = {"Carlos Lima", "912.435.810-00", "20240005", "Psicologia"};
+        cadastrarPaciente(listaPacientes, p5);
+        
+        Paciente p6 = {"Beatriz Souza", "476.839.200-88", "20240006", "Arquitetura"};
+        cadastrarPaciente(listaPacientes, p6);
+        
+        Paciente p7 = {"Lucas Pereira", "717.785.530-01", "20240007", "Enfermagem"};
+        cadastrarPaciente(listaPacientes, p7);
+        
+        Paciente p8 = {"Juliana Rocha", "378.242.540-54", "20240008", "Farmácia"};
+        cadastrarPaciente(listaPacientes, p8);
+        
+        Paciente p9 = {"Ricardo Alves", "155.073.530-69", "20240009", "Veterinária"};
+        cadastrarPaciente(listaPacientes, p9);
+        
+        Paciente p10 = {"Fernanda Martins", "419.603.620-11", "20240010", "Pedagogia"};
+        cadastrarPaciente(listaPacientes, p10);
+        
+        printf("✅ %d pacientes de teste criados!\n", tamanhoLista(listaPacientes));
+
+}
+
     int opcao;
     do {
         printf("\n=== SISTEMA DE AGENDAMENTO ===\n");
@@ -245,9 +339,28 @@ int main() {
         printf("4. Consultar por Sala\n");
         printf("5. Cancelar Agendamento\n");
         printf("6. Horarios Disponiveis\n");
-        printf("8. Mostrar Salas Livres (por data/hora)\n");
         printf("7. Historico Completo\n");
+        printf("8. Mostrar Salas Livres (por data/hora)\n");
+        printf("9. Proximos Agendamentos\n");
         printf("0. Sair\n");
+        if(flagDebug_MostraPacientes==1){
+            if (!listaVazia(listaPacientes)) {
+            printf("Pacientes: ");
+            No* atual = listaPacientes->inicio;
+            int count = 0;
+            while (atual != NULL) {
+                Paciente* p = (Paciente*)atual->dado;
+                printf("%s(%s)", p->nome, p->cpf);
+                atual = atual->proximo;
+                if (atual != NULL) {
+                    printf(", ");
+                    count++;
+                    if (count % 2 == 0) printf("\n           "); // Quebra a cada 2
+                }
+            }
+            printf("\n");
+        }
+}
         printf("Escolha: ");
         scanf("%d", &opcao);
         clear_input();
@@ -259,25 +372,9 @@ int main() {
             case 4: menuConsultarSala(); break;
             case 5: menuCancelarAgendamento(); break;
             case 6: menuHorariosDisponiveis(); break;
-            case 8: {
-                char data[MAX_DATA], hora[MAX_HORA];
-                printf("\n--- SALAS LIVRES ---\n");
-                printf("Data (DD/MM/AAAA): "); scanf("%10[^\n]", data); clear_input();
-                printf("Hora (HH:MM): "); scanf("%5[^\n]", hora); clear_input();
-                if (!validarData(data) || !validarHora(hora)) {
-                    printf("Data ou hora invalidas!\n");
-                    break;
-                }
-                printf("Salas livres em %s as %s:\n", data, hora);
-                for (int i = 0; i < SALAS_COUNT; ++i) {
-                    const char* s = getSalaNome(i);
-                    if (salaDisponivel(listaAgendamentos, s, data, hora)) {
-                        printf(" %s", s);
-                    }
-                }
-                printf("\n");
-            } break;
             case 7: menuHistoricoCompleto(); break;
+            case 8: menuSalasLivres(); break;
+            case 9: menuProximosAgendamentos();break;
             case 0: printf("Saindo...\n"); break;
             default: printf("opcao invalida!\n");
         }

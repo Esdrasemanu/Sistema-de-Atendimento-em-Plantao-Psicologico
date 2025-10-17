@@ -140,17 +140,172 @@ void exibirHorariosDisponiveis(Lista* lista, const char* data, const char* sala)
     }
 }
 
+void exibirSalasLivres(Lista* lista, const char* data, const char* hora) {
+    printf("\nSalas livres em %s as %s:\n", data, hora);
+    
+    int salasLivres = 0;
+    for (int i = 0; i < SALAS_COUNT; ++i) {
+        const char* s = getSalaNome(i);
+        if (salaDisponivel(lista, s, data, hora)) {
+            printf(" %s", s);
+            salasLivres++;
+        }
+    }
+    
+    if (salasLivres == 0) {
+        printf(" ❌ Nenhuma sala livre neste horario!");
+    }
+    printf("\n");
+}
+
+void UTILexibirAgendamentoLinha(void* dado) {
+    Agendamento* a = (Agendamento*)dado;
+    printf("| %-18s | %-6s | %-10s | %-6s | %-7s |\n", 
+           a->cpf, a->sala, a->data, a->hora, a->status);                  
+}
+
 void exibirHistoricoCompleto(Lista* lista) {
-    printf("\n=== HISTORICO COMPLETO DE AGENDAMENTOS ===\n");
-    printf("==================================================================\n");
-    printf("  CPF             Sala      Data        Hora     Status\n");
-    printf("==================================================================\n");
+    printf("\n+--------------------------------------------------------------+\n");
+    printf("|                   HISTORICO DE AGENDAMENTOS                 |\n");
+    printf("+---------------------+--------+------------+--------+---------+\n");
+    printf("|         CPF         |  Sala  |    Data    |  Hora  | Status  |\n");
+    printf("+---------------------+--------+------------+--------+---------+\n");
     
     if (listaVazia(lista)) {
-        printf("  Nenhum agendamento registrado.\n");
+        printf("|              Nenhum agendamento registrado               |\n");
     } else {
-        percorrerLista(lista, exibirAgendamentoHistorico);
+        percorrerLista(lista, UTILexibirAgendamentoLinha);
     }
-    printf("==================================================================\n");
-    printf("Total: %d agendamentos\n", tamanhoLista(lista));
+    
+    printf("+---------------------+--------+------------+--------+---------+\n");
+    printf("| Total: %-3d agendamentos |\n", tamanhoLista(lista));
+
+}
+
+// Função auxiliar para comparar datas (para ordenacao)
+int compararDatas(const char* data1, const char* data2) {
+    int dia1, mes1, ano1, dia2, mes2, ano2;
+    sscanf(data1, "%d/%d/%d", &dia1, &mes1, &ano1);
+    sscanf(data2, "%d/%d/%d", &dia2, &mes2, &ano2);
+    
+    if (ano1 != ano2) return ano1 - ano2;
+    if (mes1 != mes2) return mes1 - mes2;
+    return dia1 - dia2;
+}
+
+// Funcao auxiliar para ordenar uma lista de agendamentos por data (Insertion Sort)
+
+void ordenarAgendamentosPorData(Lista* lista) {
+    if (listaVazia(lista) || lista->inicio->proximo == NULL) return;
+    
+    No* ordenado = NULL;
+    No* atual = lista->inicio;
+    
+    while (atual != NULL) {
+        No* proximo = atual->proximo;
+        
+        // Insere o nó atual na lista ordenada
+        if (ordenado == NULL || compararDatas(((Agendamento*)atual->dado)->data, 
+                                            ((Agendamento*)ordenado->dado)->data) < 0) {
+            // Insere no início
+            atual->proximo = ordenado;
+            ordenado = atual;
+        } else {
+            // Encontra a posição correta
+            No* temp = ordenado;
+            while (temp->proximo != NULL && 
+                   compararDatas(((Agendamento*)atual->dado)->data,
+                                ((Agendamento*)temp->proximo->dado)->data) >= 0) {
+                temp = temp->proximo;
+            }
+            atual->proximo = temp->proximo;
+            temp->proximo = atual;
+        }
+        
+        atual = proximo;
+    }
+    
+    lista->inicio = ordenado;
+    
+    // Atualiza o ponteiro fim
+    No* temp = ordenado;
+    while (temp != NULL && temp->proximo != NULL) {
+        temp = temp->proximo;
+    }
+    lista->fim = temp;
+}
+
+// Funcao para criar uma copia profunda da lista
+Lista* copiarListaAgendamentos(Lista* original) {
+    if (!original) return NULL;
+    
+    Lista* copia = criarLista();
+    if (!copia) return NULL;
+    
+    No* atual = original->inicio;
+    while (atual != NULL) {
+        Agendamento* ag_original = (Agendamento*)atual->dado;
+        Agendamento* ag_copia = (Agendamento*)malloc(sizeof(Agendamento));
+        if (!ag_copia) {
+            destruirLista(copia, liberarAgendamento);
+            return NULL;
+        }
+        
+        // Cópia profunda dos dados
+        *ag_copia = *ag_original;
+        
+        if (!inserirFinal(copia, ag_copia)) {
+            free(ag_copia);
+            destruirLista(copia, liberarAgendamento);
+            return NULL;
+        }
+        
+        atual = atual->proximo;
+    }
+    
+    return copia;
+}
+
+// Nova funcao para mostrar proximos agendamentos 
+void exibirProximosAgendamentos(Lista* lista, int quantidade) {
+    if (listaVazia(lista)) {
+        printf("\n Nenhum agendamento registrado!\n");
+        return;
+    }
+    
+    // CORREÇÃO: Cria uma cópia PROFUNDA da lista para ordenar
+    Lista* copia = copiarListaAgendamentos(lista);
+    if (!copia) {
+        printf("Erro ao criar copia da lista!\n");
+        return;
+    }
+    
+    // Ordena a cópia por data (NÃO afeta a original)
+    ordenarAgendamentosPorData(copia);
+    
+    printf("\n+--------------------------------------------------------------+\n");
+    printf("|                 PROXIMOS AGENDAMENTOS                      |\n");
+    printf("+---------------------+--------+------------+--------+---------+\n");
+    printf("|         CPF         |  Sala  |    Data    |  Hora  | Status  |\n");
+    printf("+---------------------+--------+------------+--------+---------+\n");
+    
+    // Exibe apenas a quantidade solicitada (ou todos se quantidade = 0)
+    int contador = 0;
+    No* atual = copia->inicio;
+    
+    while (atual != NULL && (quantidade == 0 || contador < quantidade)) {
+        Agendamento* a = (Agendamento*)atual->dado;
+        printf("| %-18s | %-6s | %-10s | %-6s | %-7s |\n", 
+               a->cpf, a->sala, a->data, a->hora, a->status);
+        atual = atual->proximo;
+        contador++;
+    }
+    
+    printf("+---------------------+--------+------------+--------+---------+\n");
+    printf("| Mostrando %-2d de %-36d agendamentos |\n", 
+           contador, tamanhoLista(lista));
+    printf("+--------------------------------------------------------------+\n");
+    
+    // Libera a copia
+    destruirLista(copia, liberarAgendamento);
 }
