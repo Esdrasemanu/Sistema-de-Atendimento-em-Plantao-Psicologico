@@ -2,7 +2,10 @@
 #define PACIENTE_H
 
 #include "lista.h"
-
+// Inclusão da estrutura de lista genérica usada para armazenar pacientes
+// Definições de tamanho máximo para os campos de texto
+// Estrutura que representa um paciente (ex: aluno de uma universidade)
+// Contém nome, CPF, matrícula e curso.//Esdras Emanuel 
 #define MAX_NOME 50
 #define MAX_CPF 15
 #define MAX_MATRICULA 20
