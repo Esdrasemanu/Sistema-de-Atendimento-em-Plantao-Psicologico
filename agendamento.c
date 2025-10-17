@@ -45,46 +45,46 @@ void liberarAgendamento(void* dado) {
 }
 
 int cadastrarAgendamento(Lista* lista, Agendamento a) {
-    // Validações em camadas
+    // Validacoes em camadas
     if (!validarCPF(a.cpf)) {
-        printf("❌ CPF invalido!\n");
+        printf("CPF invalido!\n");
         return 0;
     }
     
     if (!validarSala(a.sala)) {
-        printf("❌ Sala invalida! ");
+        printf("Sala invalida! ");
         imprimirSalas();
         return 0;
     }
     
     if (!validarData(a.data)) {
-        printf("❌ Formato de data invalido! Use DD/MM/AAAA.\n");
+        printf("Formato de data invalido! Use DD/MM/AAAA.\n");
         return 0;
     }
     
     if (!validarDataFutura(a.data)) {
-        printf("❌ Data ja passou! Use uma data futura.\n");
+        printf("Data ja passou! Use uma data futura.\n");
         return 0;
     }
     
     if (!validarHora(a.hora)) {
-        printf("❌ Formato de hora invalido! Use HH:MM.\n");
+        printf("Formato de hora invalido! Use HH:MM.\n");
         return 0;
     }
     
     if (!validarHoraIntervalo(a.hora)) {
-        printf("❌ Hora invalida! Use horarios em intervalos de 15 min (ex: 14:00, 14:15, 14:30, 14:45).\n");
+        printf("Hora invalida! Use horarios em intervalos de 15 min (ex: 14:00, 14:15, 14:30, 14:45).\n");
         return 0;
     }
     
     if (!ehDataHoraFutura(a.data, a.hora)) {
-        printf("❌ Data/hora ja passou! Use uma data/hora futura.\n");
+        printf("Data/hora ja passou! Use uma data/hora futura.\n");
         return 0;
     }
     
     // Verifica se a sala está disponível na data/hora
     if (!salaDisponivel(lista, a.sala, a.data, a.hora)) {
-        printf("❌ Sala %s ja esta ocupada em %s as %s!\n", a.sala, a.data, a.hora);
+        printf("Sala %s ja esta ocupada em %s as %s!\n", a.sala, a.data, a.hora);
         return 0;
     }
 
@@ -95,7 +95,10 @@ int cadastrarAgendamento(Lista* lista, Agendamento a) {
 }
 
 
-// NOVA função para verificar se há agendamentos
+/**
+ * @brief Funcao que implementa verificao de lista vazia da lista generica.
+ * @autor [andrericardo]
+ */
 int temAgendamentos(Lista* lista) {
     return !listaVazia(lista);
 }
@@ -121,25 +124,70 @@ Lista* buscarAgendamentosSala(Lista* lista, const char* sala) {
     return buscarTodosElementos(lista, (void*)sala, compararAgendamentoSala);
 }
 
+/**
+ * @brief Funcao que mostra horarios disponiveis em uma data e sala, strings passadas por parametro, e usando a lista de agendamentos
+ * @autor [andrericardo]
+ */
 void exibirHorariosDisponiveis(Lista* lista, const char* data, const char* sala) {
-    printf("\n--- HORARIOS DISPONIVEIS - %s - Sala %s ---\n", data, sala);
-    printf("Horarios livres: 08:00, 09:00, 10:00, 11:00, 14:00, 15:00, 16:00, 17:00\n");
+    printf("\n+--------------------------------------------------------------+\n");
+    printf("| HORARIOS DISPONIVEIS - %s - Sala %s |\n", data, sala);
+    printf("+--------+------------+\n");
+    printf("| Hora   | Disponivel |\n");
+    printf("+--------+------------+\n");
     
-    // Verifica horários ocupados
-    if (!listaVazia(lista)) {
-        printf("Horarios ocupados: ");
-        No* atual = lista->inicio;
-        while (atual != NULL) {
-            Agendamento* a = (Agendamento*)atual->dado;
-            if (strcmp(a->data, data) == 0 && strcmp(a->sala, sala) == 0) {
-                printf("%s ", a->hora);
+    // Todos os horários possíveis do dia
+    char* horarios[] = {
+        "08:00", "08:15", "08:30", "08:45",
+        "09:00", "09:15", "09:30", "09:45", 
+        "10:00", "10:15", "10:30", "10:45",
+        "11:00", "11:15", "11:30", "11:45",
+        "12:00", "12:15", "12:30", "12:45",
+        "13:00", "13:15", "13:30", "13:45",
+        "14:00", "14:15", "14:30", "14:45",
+        "15:00", "15:15", "15:30", "15:45",
+        "16:00", "16:15", "16:30", "16:45",
+        "17:00", "17:15", "17:30", "17:45"
+    };
+    
+    int totalHorarios = 40;
+    int horariosLivres = 0;
+    
+    for (int i = 0; i < totalHorarios; i++) {
+        int disponivel = 1; // Assume que está livre
+        
+        // Verifica se há algum agendamento neste horário
+        if (!listaVazia(lista)) {
+            No* atual = lista->inicio;
+            while (atual != NULL) {
+                Agendamento* a = (Agendamento*)atual->dado;
+                if (strcmp(a->data, data) == 0 && 
+                    strcmp(a->sala, sala) == 0 && 
+                    strcmp(a->hora, horarios[i]) == 0 &&
+                    strcmp(a->status, "agendado") == 0) {
+                    disponivel = 0; // Está ocupado
+                    break;
+                }
+                atual = atual->proximo;
             }
-            atual = atual->proximo;
         }
-        printf("\n");
+        
+        if (disponivel) {
+            printf("| %-6s |    LIVRE   |\n", horarios[i]);
+            horariosLivres++;
+        } else {
+            printf("| %-6s |  OCUPADO   |\n", horarios[i]);
+        }
     }
+    
+    printf("+--------+------------+\n");
+    printf("| Total de horarios livres: %-28d |\n", horariosLivres);
+    printf("+--------------------------------------------------------------+\n");
 }
 
+/**
+ * @brief Funcao que mostra horarios disponiveis em uma sala e horario , strings passadas por parametro, e usando a lista de agendamentos
+ * @autor [andrericardo]
+ */
 void exibirSalasLivres(Lista* lista, const char* data, const char* hora) {
     printf("\nSalas livres em %s as %s:\n", data, hora);
     
@@ -153,17 +201,25 @@ void exibirSalasLivres(Lista* lista, const char* data, const char* hora) {
     }
     
     if (salasLivres == 0) {
-        printf(" ❌ Nenhuma sala livre neste horario!");
+        printf("Nenhuma sala livre neste horario!");
     }
     printf("\n");
 }
 
+/**
+ * @brief Funcao utilitaria usada por exibirHistoricoCompleto(), que exibe todos os dados de um no da lista agendamento
+ * @autor [andrericardo]
+ */
 void UTILexibirAgendamentoLinha(void* dado) {
     Agendamento* a = (Agendamento*)dado;
     printf("| %-18s | %-6s | %-10s | %-6s | %-7s |\n", 
            a->cpf, a->sala, a->data, a->hora, a->status);                  
 }
 
+/**
+ * @brief Funcao que mostra uma lista com cabecalho, e percorre a lista usando a funcao utilitaria UTILexibirAgendamentoLinha(), assim mostrando os registros em ordem de insercao na lista
+ * @autor [andrericardo]
+ */
 void exibirHistoricoCompleto(Lista* lista) {
     printf("\n+--------------------------------------------------------------+\n");
     printf("|                   HISTORICO DE AGENDAMENTOS                 |\n");
@@ -182,7 +238,11 @@ void exibirHistoricoCompleto(Lista* lista) {
 
 }
 
-// Função auxiliar para comparar datas (para ordenacao)
+
+/**
+ * @brief Funcao auxiliar para comparar datas (para ordenacao)
+ * @autor [andrericardo]
+ */
 int compararDatas(const char* data1, const char* data2) {
     int dia1, mes1, ano1, dia2, mes2, ano2;
     sscanf(data1, "%d/%d/%d", &dia1, &mes1, &ano1);
@@ -193,7 +253,10 @@ int compararDatas(const char* data1, const char* data2) {
     return dia1 - dia2;
 }
 
-
+/**
+ * @brief Funcao auxiliar para comparar datas E hora (pra ordenacao)
+ * @autor [andrericardo]
+ */
 int compararDataHora(Agendamento* a1, Agendamento* a2) {
     // Primeiro compara as datas
     int cmpData = compararDatas(a1->data, a2->data);
@@ -203,6 +266,10 @@ int compararDataHora(Agendamento* a1, Agendamento* a2) {
     return strcmp(a1->hora, a2->hora);
 }
 
+/**
+ * @brief Funcao que ordena os agendamentos por data e hora em uma nova lista (nao modifica estrutura da lista original)
+ * @autor [andrericardo]
+ */
 void ordenarAgendamentosPorDataHora(Lista* lista) {
     if (listaVazia(lista) || lista->inicio->proximo == NULL) return;
     
@@ -243,12 +310,13 @@ void ordenarAgendamentosPorDataHora(Lista* lista) {
     lista->fim = temp;
 }
 
-// Função auxiliar para comparar data E hora
 
 
+/**
+ * @brief Funcao auxiliar para criar uma copia da lista
+ * @autor [andrericardo]
+ */
 
-
-// Funcao para criar uma copia profunda da lista
 Lista* copiarListaAgendamentos(Lista* original) {
     if (!original) return NULL;
     
@@ -263,8 +331,7 @@ Lista* copiarListaAgendamentos(Lista* original) {
             destruirLista(copia, liberarAgendamento);
             return NULL;
         }
-        
-        // Cópia profunda dos dados
+    
         *ag_copia = *ag_original;
         
         if (!inserirFinal(copia, ag_copia)) {
@@ -279,14 +346,18 @@ Lista* copiarListaAgendamentos(Lista* original) {
     return copia;
 }
 
-// Nova funcao para mostrar proximos agendamentos 
+
+/**
+ * @brief Funcao para mostrar proximos agendamentos (registros da lista original, porem em ordem cronologica)
+ * @autor [andrericardo]
+ */
+
 void exibirProximosAgendamentos(Lista* lista, int quantidade) {
     if (listaVazia(lista)) {
         printf("\n Nenhum agendamento registrado!\n");
         return;
     }
     
-    // CORREÇÃO: Cria uma cópia PROFUNDA apenas dos agendamentos FUTUROS
     Lista* copia = criarLista();
     if (!copia) {
         printf("Erro ao criar copia da lista!\n");
@@ -307,7 +378,7 @@ void exibirProximosAgendamentos(Lista* lista, int quantidade) {
                 strcpy(novoAg->data, ag->data);
                 strcpy(novoAg->hora, ag->hora);
                 strcpy(novoAg->status, ag->status);
-                inserirFinal(copia, novoAg); // CORREÇÃO: mudado para inserirFinal
+                inserirFinal(copia, novoAg); 
             }
         }
         atual = atual->proximo;

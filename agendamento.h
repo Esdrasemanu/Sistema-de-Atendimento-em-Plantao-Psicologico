@@ -6,7 +6,7 @@
 #define MAX_SALA 10
 #define MAX_DATA 11
 #define MAX_HORA 6
-#define MAX_CPF 15  // Adicionado aqui também
+#define MAX_CPF 15  
 
 typedef struct {
     char cpf[MAX_CPF];
@@ -21,7 +21,7 @@ typedef struct {
     char data[MAX_DATA];
 } ChaveCPFData;
 
-// Funções agendamento
+
 void exibirAgendamento(void* dado);
 void exibirAgendamentoDetalhado(void* dado);
 void exibirAgendamentoHistorico(void* dado);

@@ -1,9 +1,6 @@
 #include "lista.h"
 
-/**
- * @brief Cria e inicializa uma nova lista vazia
- * @autor [Seu Nome]
- */
+
 Lista* criarLista() {
     Lista* nova = (Lista*)malloc(sizeof(Lista));
     if (nova == NULL) {

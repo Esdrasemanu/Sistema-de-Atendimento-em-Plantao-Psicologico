@@ -27,6 +27,10 @@ void clear_input() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
+/**
+ * @brief Imprime uma lista com cabecalho com horario e salas livres para agendamento de consulta, em data passada por parametro. (é utilizada por menuMostraSalaseHorarios() )
+ * @autor [andrericardo]
+ */
 void exibirTodasSalasLivresData(const char* data) {  
     printf("\n+--------------------------------------------------------------+\n");
     printf("|            SALAS LIVRES EM %s                          |\n", data);
@@ -329,6 +333,10 @@ void menuCancelarAgendamento() {
     clear_input();
 }
 
+/**
+ * @brief Pede input de data e sala, e imprime horarios disponiveis
+ * @autor [andrericardo]
+ */
 void menuHorariosDisponiveis() {
     CLEAR_SCREEN();
     char data[MAX_DATA], sala[MAX_SALA];
@@ -355,6 +363,10 @@ void menuHorariosDisponiveis() {
     clear_input();
 }
 
+/**
+ * @brief Imprime a lista agendamento, nesse caso tratado como "historico de agendamentos feitos."
+ * @autor [andrericardo]
+ */
 void menuHistoricoCompleto() {
     CLEAR_SCREEN();
     printf("\n=== SISTEMA DE AGENDAMENTO ===\n");
@@ -363,6 +375,10 @@ void menuHistoricoCompleto() {
     clear_input();
 }
 
+/**
+ * @brief Pede input de data e horario, e imprime salas disponiveis
+ * @autor [andrericardo]
+ */
 void menuSalasDisponiveis() {
     CLEAR_SCREEN();
     char data[MAX_DATA], hora[MAX_HORA];
@@ -399,6 +415,13 @@ void menuSalasDisponiveis() {
     clear_input();
 }
 
+/**
+ * @brief Funcao utilitaria que calcula e atualiza a proxima data (proximo dia) a partir de uma data informada
+ *
+ * leva em consideracao o numero de dias de cada mes e os anos bissextos.
+ * O resultado e escrito de volta na mesma string fornecida como parametro.
+ * @autor [andrericardo]
+ */
 void calcularProximaData(char *data) {
     int dia, mes, ano;
     sscanf(data, "%d/%d/%d", &dia, &mes, &ano);
@@ -425,6 +448,13 @@ void calcularProximaData(char *data) {
     sprintf(data, "%02d/%02d/%04d", dia, mes, ano);
 }
 
+/**
+ * @brief Funcao utilitaria que calcula e atualiza a data anterior (dia anterior) a partir de uma data informada
+ *
+ * leva em consideracao o numero de dias de cada mes e os anos bissextos.
+ * O resultado e escrito de volta na mesma string fornecida como parametro.
+ * @autor [andrericardo]
+ */
 void calcularDataAnterior(char *data) {
     int dia, mes, ano;
     sscanf(data, "%d/%d/%d", &dia, &mes, &ano);
@@ -452,6 +482,10 @@ void calcularDataAnterior(char *data) {
     sprintf(data, "%02d/%02d/%04d", dia, mes, ano);
 }
 
+/**
+ * @brief Funcao que coleta data e permite o sistema de navegacao para mostrar listas implementadas na funcao exibirTodasSalasLivresData().
+ * @autor [andrericardo]
+ */
 void menuMostraSalaseHorarios() {
     CLEAR_SCREEN();
     char data[MAX_DATA];
