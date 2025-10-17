@@ -6,6 +6,7 @@
 #include "agendamento.h"
 #include "validaCpf.h"
 #include "validaDataHora.h"
+#include "validaSala.h"
 
 Lista* listaPacientes;
 Lista* listaAgendamentos;
@@ -19,7 +20,13 @@ void menuCadastrarPaciente() {
     Paciente p;
     printf("\n--- CADASTRAR PACIENTE ---\n");
     printf("Nome: "); scanf("%49[^\n]", p.nome); clear_input();
-    printf("CPF: "); scanf("%14[^\n]", p.cpf); clear_input();
+    // Lê CPF com repetição até ser válido ou o usuário digitar '0' para cancelar
+    while (1) {
+        printf("CPF (digite 0 para cancelar): "); scanf("%14[^\n]", p.cpf); clear_input();
+        if (strcmp(p.cpf, "0") == 0) return;
+        if (validarCPF(p.cpf)) break;
+        printf("CPF invalido! Tente novamente.\n");
+    }
     printf("Matricula: "); scanf("%19[^\n]", p.matricula); clear_input();
     printf("Curso: "); scanf("%49[^\n]", p.curso); clear_input();
 
@@ -41,17 +48,37 @@ void menuAgendarConsulta() {
     char cpf[MAX_CPF];
     
     printf("\n--- AGENDAR CONSULTA ---\n");
-    printf("CPF do paciente: "); scanf("%14[^\n]", cpf); clear_input();
-    
-    if (!buscarPacienteCPF(listaPacientes, cpf)) {
-        printf("❌ Paciente nao encontrado! Cadastre primeiro.\n");
-        return;
+    // Lê CPF do paciente com repetição e validação
+    while (1) {
+        printf("CPF do paciente (0 para cancelar): "); scanf("%14[^\n]", cpf); clear_input();
+        if (strcmp(cpf, "0") == 0) return;
+        if (!validarCPF(cpf)) { printf("CPF invalido!\n"); continue; }
+        if (!buscarPacienteCPF(listaPacientes, cpf)) { printf("Paciente nao encontrado! Cadastre primeiro.\n"); continue; }
+        break;
     }
     
     strcpy(a.cpf, cpf);
-    printf("Sala: "); scanf("%9[^\n]", a.sala); clear_input();
-    printf("Data (DD/MM/AAAA): "); scanf("%10[^\n]", a.data); clear_input();
-    printf("Hora (HH:MM): "); scanf("%5[^\n]", a.hora); clear_input();
+    // Sala: repetir até válida ou cancelamento
+    while (1) {
+        printf("Sala (0 para cancelar): "); scanf("%9[^\n]", a.sala); clear_input();
+        if (strcmp(a.sala, "0") == 0) return;
+        if (!validarSala(a.sala)) { printf("Sala invalida!\n"); imprimirSalas(); continue; }
+        break;
+    }
+    // Data: repetir até válida ou cancelar
+    while (1) {
+        printf("Data (DD/MM/AAAA) (0 para cancelar): "); scanf("%10[^\n]", a.data); clear_input();
+        if (strcmp(a.data, "0") == 0) return;
+        if (!validarData(a.data)) { printf("Data invalida!\n"); continue; }
+        break;
+    }
+    // Hora: repetir até válida ou cancelar
+    while (1) {
+        printf("Hora (HH:MM) (0 para cancelar): "); scanf("%5[^\n]", a.hora); clear_input();
+        if (strcmp(a.hora, "0") == 0) return;
+        if (!validarHora(a.hora)) { printf("Hora invalida!\n"); continue; }
+        break;
+    }
     strcpy(a.status, "agendado");
 
     if (!validarCPF(a.cpf)) {
@@ -66,7 +93,12 @@ void menuAgendarConsulta() {
         printf("Hora invalida!\n");
         return;
     }
-    
+    // Verifica disponibilidade da sala no horario
+    if (!salaDisponivel(listaAgendamentos, a.sala, a.data, a.hora)) {
+        printf("Sala %s ocupada em %s as %s! Escolha outro horario ou sala.\n", a.sala, a.data, a.hora);
+        return;
+    }
+
     if (cadastrarAgendamento(listaAgendamentos, a)) {
         printf("✅ Consulta agendada com sucesso!\n");
     } else {
@@ -77,8 +109,13 @@ void menuAgendarConsulta() {
 void menuConsultarCPF() {
     char cpf[MAX_CPF];
     printf("\n--- CONSULTAR POR CPF ---\n");
-    printf("CPF: "); scanf("%14[^\n]", cpf); clear_input();
-    
+    // Repetir leitura de CPF até válido ou cancelamento
+    while (1) {
+        printf("CPF (0 para cancelar): "); scanf("%14[^\n]", cpf); clear_input();
+        if (strcmp(cpf, "0") == 0) return;
+        if (!validarCPF(cpf)) { printf("CPF invalido!\n"); continue; }
+        break;
+    }
     Lista* resultado = buscarAgendamentosCPF(listaAgendamentos, cpf);
     if (resultado) {
         printf("\nAgendamentos para CPF %s:\n", cpf);
@@ -92,8 +129,13 @@ void menuConsultarCPF() {
 void menuConsultarSala() {
     char sala[MAX_SALA];
     printf("\n--- CONSULTAR POR SALA ---\n");
-    printf("Sala: "); scanf("%9[^\n]", sala); clear_input();
-    
+    // Repetir leitura de sala até válida ou cancelamento
+    while (1) {
+        printf("Sala (0 para cancelar): "); scanf("%9[^\n]", sala); clear_input();
+        if (strcmp(sala, "0") == 0) return;
+        if (!validarSala(sala)) { printf("Sala invalida!\n"); imprimirSalas(); continue; }
+        break;
+    }
     Lista* resultado = buscarAgendamentosSala(listaAgendamentos, sala);
     if (resultado) {
         printf("\nAgendamentos na Sala %s:\n", sala);
@@ -107,9 +149,21 @@ void menuConsultarSala() {
 void menuCancelarAgendamento() {
     char cpf[MAX_CPF], data[MAX_DATA];
     printf("\n--- CANCELAR AGENDAMENTO ---\n");
-    printf("CPF: "); scanf("%14[^\n]", cpf); clear_input();
-    printf("Data (DD/MM/AAAA): "); scanf("%10[^\n]", data); clear_input();
-    
+    // Ler CPF (repetir até valido ou cancelar)
+    while (1) {
+        printf("CPF (0 para cancelar): "); scanf("%14[^\n]", cpf); clear_input();
+        if (strcmp(cpf, "0") == 0) return;
+        if (!validarCPF(cpf)) { printf("CPF invalido!\n"); continue; }
+        break;
+    }
+    // Ler data (repetir até valida ou cancelar)
+    while (1) {
+        printf("Data (DD/MM/AAAA) (0 para cancelar): "); scanf("%10[^\n]", data); clear_input();
+        if (strcmp(data, "0") == 0) return;
+        if (!validarData(data)) { printf("Data invalida!\n"); continue; }
+        break;
+    }
+
     if (cancelarAgendamento(listaAgendamentos, cpf, data)) {
         printf("✅ Agendamento cancelado com sucesso!\n");
     } else {
@@ -120,9 +174,20 @@ void menuCancelarAgendamento() {
 void menuHorariosDisponiveis() {
     char data[MAX_DATA], sala[MAX_SALA];
     printf("\n--- HORARIOS DISPONIVEIS ---\n");
-    printf("Data (DD/MM/AAAA): "); scanf("%10[^\n]", data); clear_input();
-    printf("Sala: "); scanf("%9[^\n]", sala); clear_input();
-    
+    // Ler data (repetir até valida ou cancelar)
+    while (1) {
+        printf("Data (DD/MM/AAAA) (0 para cancelar): "); scanf("%10[^\n]", data); clear_input();
+        if (strcmp(data, "0") == 0) return;
+        if (!validarData(data)) { printf("Data invalida!\n"); continue; }
+        break;
+    }
+    // Ler sala (repetir até valida ou cancelar)
+    while (1) {
+        printf("Sala (0 para cancelar): "); scanf("%9[^\n]", sala); clear_input();
+        if (strcmp(sala, "0") == 0) return;
+        if (!validarSala(sala)) { printf("Sala invalida!\n"); imprimirSalas(); continue; }
+        break;
+    }
     exibirHorariosDisponiveis(listaAgendamentos, data, sala);
 }
 
@@ -142,12 +207,14 @@ int main() {
     int opcao;
     do {
         printf("\n=== SISTEMA DE AGENDAMENTO ===\n");
+        
         printf("1. Cadastrar Paciente\n");
         printf("2. Agendar Consulta\n");
         printf("3. Consultar por CPF\n");
         printf("4. Consultar por Sala\n");
         printf("5. Cancelar Agendamento\n");
         printf("6. Horarios Disponiveis\n");
+        printf("8. Mostrar Salas Livres (por data/hora)\n");
         printf("7. Historico Completo\n");
         printf("0. Sair\n");
         printf("Escolha: ");
@@ -161,6 +228,24 @@ int main() {
             case 4: menuConsultarSala(); break;
             case 5: menuCancelarAgendamento(); break;
             case 6: menuHorariosDisponiveis(); break;
+            case 8: {
+                char data[MAX_DATA], hora[MAX_HORA];
+                printf("\n--- SALAS LIVRES ---\n");
+                printf("Data (DD/MM/AAAA): "); scanf("%10[^\n]", data); clear_input();
+                printf("Hora (HH:MM): "); scanf("%5[^\n]", hora); clear_input();
+                if (!validarData(data) || !validarHora(hora)) {
+                    printf("Data ou hora invalidas!\n");
+                    break;
+                }
+                printf("Salas livres em %s as %s:\n", data, hora);
+                for (int i = 0; i < SALAS_COUNT; ++i) {
+                    const char* s = getSalaNome(i);
+                    if (salaDisponivel(listaAgendamentos, s, data, hora)) {
+                        printf(" %s", s);
+                    }
+                }
+                printf("\n");
+            } break;
             case 7: menuHistoricoCompleto(); break;
             case 0: printf("👋 Saindo...\n"); break;
             default: printf("❌ Opcao invalida!\n");
